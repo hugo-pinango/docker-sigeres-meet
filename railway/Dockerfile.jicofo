@@ -1,0 +1,17 @@
+ARG JITSI_REPO=jitsi
+ARG BASE_TAG=stable
+FROM ${JITSI_REPO}/base-java:${BASE_TAG}
+
+LABEL org.opencontainers.image.title="Jitsi Jicofo (Railway)"
+
+COPY jicofo/rootfs/ /
+COPY railway/rootfs-jicofo/ /
+
+RUN apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y jicofo && \
+    apt-cleanup
+
+EXPOSE 8888
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:8888/about/health || exit 1

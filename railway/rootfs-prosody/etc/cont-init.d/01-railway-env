@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv bash
+
+# Railway environment adaptation for prosody service
+# En Railway, prosody se expone internamente como prosody.railway.internal
+
+echo ">>> Configuring Prosody for Railway deployment"
+
+# Railway private networking no requiere encryption entre servicios internos
+export PROSODY_C2S_REQUIRE_ENCRYPTION=${PROSODY_C2S_REQUIRE_ENCRYPTION:-0}
+
+# Deshabilitar límites S2S/C2S por defecto en Railway (red confiable)
+export PROSODY_DISABLE_C2S_LIMIT=${PROSODY_DISABLE_C2S_LIMIT:-1}
+export PROSODY_DISABLE_S2S_LIMIT=${PROSODY_DISABLE_S2S_LIMIT:-1}
+
+echo ">>> Prosody configured for Railway internal network"
+echo ">>> XMPP_DOMAIN: ${XMPP_DOMAIN:-meet.jitsi}"

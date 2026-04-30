@@ -1,0 +1,22 @@
+ARG JITSI_REPO=jitsi
+ARG BASE_TAG=stable
+FROM ${JITSI_REPO}/base-java:${BASE_TAG}
+
+LABEL org.opencontainers.image.title="Jitsi JVB (Railway)"
+
+COPY jvb/rootfs/ /
+COPY railway/rootfs-jvb/ /
+
+RUN apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y jitsi-videobridge2 dnsutils curl jq && \
+    apt-cleanup
+
+# Habilitar WebSocket como transporte principal (Railway no soporta UDP bien)
+ENV ENABLE_COLIBRI_WEBSOCKET=1 \
+    COLIBRI_WEBSOCKET_PORT=9090 \
+    JVB_PORT=10000
+
+EXPOSE 9090 10000/udp 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:8080/about/health || exit 1

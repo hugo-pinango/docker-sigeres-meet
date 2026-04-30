@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv bash
+
+# Railway environment adaptation for JVB service
+
+echo ">>> Configuring JVB for Railway deployment"
+
+# Apuntar al prosody interno de Railway
+export XMPP_SERVER=${XMPP_SERVER:-prosody.railway.internal}
+export XMPP_PORT=${XMPP_PORT:-5222}
+
+# En Railway, WebSocket es el transporte principal (UDP limitado)
+export ENABLE_COLIBRI_WEBSOCKET=${ENABLE_COLIBRI_WEBSOCKET:-1}
+
+# Obtener IP pública para advertise si no está configurada
+if [ -z "$JVB_ADVERTISE_IPS" ]; then
+    PUBLIC_IP=$(curl -sf https://api.ipify.org 2>/dev/null || echo "")
+    if [ -n "$PUBLIC_IP" ]; then
+        export JVB_ADVERTISE_IPS="$PUBLIC_IP"
+        echo ">>> Auto-detected public IP: $PUBLIC_IP"
+    fi
+fi
+
+# Desactivar STUN si no hay UDP disponible
+if [ "${RAILWAY_NO_UDP:-0}" = "1" ]; then
+    export JVB_DISABLE_STUN=true
+    echo ">>> STUN disabled (no UDP available)"
+fi
+
+echo ">>> JVB connecting to XMPP at: ${XMPP_SERVER}:${XMPP_PORT}"
+echo ">>> Colibri WebSocket enabled on port: ${COLIBRI_WEBSOCKET_PORT:-9090}"

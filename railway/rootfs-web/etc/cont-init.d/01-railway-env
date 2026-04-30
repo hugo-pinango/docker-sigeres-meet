@@ -1,0 +1,38 @@
+#!/usr/bin/with-contenv bash
+
+# Railway environment adaptation for web service
+# Railway provides PORT env var and handles TLS termination at edge
+
+echo ">>> Configuring web service for Railway deployment"
+
+# Railway asigna un puerto dinámico via $PORT, nginx debe escuchar ahí
+if [ -n "$PORT" ]; then
+    echo ">>> Railway PORT detected: $PORT"
+    export HTTP_PORT="${PORT}"
+fi
+
+# Desactivar HTTPS ya que Railway maneja TLS en su proxy
+export DISABLE_HTTPS=1
+export ENABLE_HTTP_REDIRECT=0
+export ENABLE_HSTS=0
+export ENABLE_IPV6=0
+
+# Configurar resolver para red interna de Railway
+# Railway usa DNS interno para resolver *.railway.internal
+export NGINX_RESOLVER="${NGINX_RESOLVER:-8.8.8.8 1.1.1.1}"
+
+# Si no se especifica XMPP_BOSH_URL_BASE, usar el hostname interno de Railway
+if [ -z "$XMPP_BOSH_URL_BASE" ]; then
+    export XMPP_BOSH_URL_BASE="http://${XMPP_SERVER:-prosody.railway.internal}:5280"
+fi
+
+# Para colibri-ws, en Railway necesitamos resolver el JVB por su nombre interno
+# En lugar de hacer DNS lookup (que falla durante build), usar el nombre directamente
+if [ -z "$COLIBRI_WEBSOCKET_REGEX" ]; then
+    export DISABLE_COLIBRI_WEBSOCKET_JVB_LOOKUP=1
+    export COLIBRI_WEBSOCKET_REGEX="${COLIBRI_WEBSOCKET_JVB_LOOKUP_NAME:-jvb.railway.internal}"
+fi
+
+echo ">>> XMPP_BOSH_URL_BASE: $XMPP_BOSH_URL_BASE"
+echo ">>> PUBLIC_URL: $PUBLIC_URL"
+echo ">>> Colibri WS regex: $COLIBRI_WEBSOCKET_REGEX"

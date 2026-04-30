@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+
+# Railway environment adaptation for jicofo service
+
+echo ">>> Configuring Jicofo for Railway deployment"
+
+# Apuntar al prosody interno de Railway
+export XMPP_SERVER=${XMPP_SERVER:-prosody.railway.internal}
+export XMPP_PORT=${XMPP_PORT:-5222}
+
+# Habilitar health checks para Railway
+export JICOFO_ENABLE_HEALTH_CHECKS=${JICOFO_ENABLE_HEALTH_CHECKS:-true}
+export JICOFO_ENABLE_REST=${JICOFO_ENABLE_REST:-true}
+
+echo ">>> Jicofo connecting to XMPP at: ${XMPP_SERVER}:${XMPP_PORT}"

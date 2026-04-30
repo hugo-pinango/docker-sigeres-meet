@@ -1,0 +1,32 @@
+ARG JITSI_REPO=jitsi
+ARG BASE_TAG=stable
+FROM ${JITSI_REPO}/base:${BASE_TAG}
+
+LABEL org.opencontainers.image.title="Jitsi Prosody (Railway)"
+
+COPY prosody/rootfs/ /
+COPY railway/rootfs-prosody/ /
+
+RUN apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y \
+        prosody \
+        prosody-modules \
+        lua5.4 \
+        lua-basexx \
+        lua-ldap \
+        lua-sec \
+        lua-unbound \
+        sasl2-bin \
+        libsasl2-modules-ldap && \
+    apt-dpkg-wrap apt-get install -y -t bookworm-backports lua-event && \
+    apt-cleanup
+
+# Copiar plugins de Jitsi
+RUN apt-dpkg-wrap apt-get update && \
+    apt-dpkg-wrap apt-get install -y jitsi-meet-prosody && \
+    apt-cleanup
+
+EXPOSE 5222 5280 5269 5347
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:5280/http-bind || exit 1
