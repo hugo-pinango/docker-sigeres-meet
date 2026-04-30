@@ -5,6 +5,10 @@
 
 echo ">>> Configuring Prosody for Railway deployment"
 
+# Crear directorios necesarios (en Railway no hay volúmenes montados)
+mkdir -p /config/data /config/certs
+mkdir -p /prosody-plugins-custom /prosody-plugins-contrib
+
 # Railway private networking no requiere encryption entre servicios internos
 export PROSODY_C2S_REQUIRE_ENCRYPTION=${PROSODY_C2S_REQUIRE_ENCRYPTION:-0}
 

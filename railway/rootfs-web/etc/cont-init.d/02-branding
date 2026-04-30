@@ -1,0 +1,26 @@
+#!/usr/bin/with-contenv bash
+
+# Rebranding: Jitsi Meet -> Sigeres
+echo ">>> Applying Sigeres branding"
+
+# Cambiar título en index.html
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/index.html 2>/dev/null || true
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/static/*.html 2>/dev/null || true
+
+# Cambiar en el head.html si existe
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/head.html 2>/dev/null || true
+
+# Copiar custom configs si existen en el overlay
+if [ -f /config/custom-interface_config.js ]; then
+    echo ">>> custom-interface_config.js already exists"
+else
+    cp /defaults/custom-interface_config.js /config/custom-interface_config.js 2>/dev/null || true
+fi
+
+if [ -f /config/custom-config.js ]; then
+    echo ">>> custom-config.js already exists"
+else
+    cp /defaults/custom-config.js /config/custom-config.js 2>/dev/null || true
+fi
+
+echo ">>> Branding applied: Sigeres"

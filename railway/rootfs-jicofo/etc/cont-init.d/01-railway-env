@@ -4,6 +4,9 @@
 
 echo ">>> Configuring Jicofo for Railway deployment"
 
+# Crear directorio /config (en Railway no hay volúmenes montados)
+mkdir -p /config
+
 # Apuntar al prosody interno de Railway
 export XMPP_SERVER=${XMPP_SERVER:-prosody.railway.internal}
 export XMPP_PORT=${XMPP_PORT:-5222}
