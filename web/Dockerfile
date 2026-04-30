@@ -19,4 +19,4 @@ RUN apt-dpkg-wrap apt-get update && \
 
 EXPOSE 80 443
 
-VOLUME ["/config", "/usr/share/jitsi-meet/transcripts"]
+#VOLUME ["/config", "/usr/share/jitsi-meet/transcripts"]
