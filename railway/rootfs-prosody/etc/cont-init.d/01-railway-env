@@ -9,6 +9,13 @@ echo ">>> Configuring Prosody for Railway deployment"
 mkdir -p /config/data /config/certs
 mkdir -p /prosody-plugins-custom /prosody-plugins-contrib
 
+# Railway asigna PORT para healthcheck — prosody HTTP debe escuchar ahí
+# Si PORT está seteado y no es 5280, configurar PROSODY_HTTP_PORT
+if [ -n "$PORT" ] && [ "$PORT" != "5280" ]; then
+    export PROSODY_HTTP_PORT="$PORT"
+    echo ">>> Prosody HTTP port set to Railway PORT: $PORT"
+fi
+
 # Railway private networking no requiere encryption entre servicios internos
 export PROSODY_C2S_REQUIRE_ENCRYPTION=${PROSODY_C2S_REQUIRE_ENCRYPTION:-0}
 
