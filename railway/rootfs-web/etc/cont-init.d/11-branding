@@ -1,0 +1,32 @@
+#!/usr/bin/with-contenv bash
+
+# Rebranding: Jitsi Meet -> Sigeres
+# Se ejecuta DESPUÉS de 10-config que genera /config/config.js y /config/interface_config.js
+echo ">>> Applying Sigeres branding"
+
+# Cambiar título en todos los HTML
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/index.html 2>/dev/null || true
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/static/*.html 2>/dev/null || true
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/head.html 2>/dev/null || true
+sed -i 's/Jitsi Meet/Sigeres/g' /usr/share/jitsi-meet/title.html 2>/dev/null || true
+
+# Agregar appName al config.js generado por 10-config
+if [ -f /config/config.js ]; then
+    echo "config.appName = 'Sigeres';" >> /config/config.js
+fi
+
+# Agregar branding al interface_config.js generado por 10-config
+if [ -f /config/interface_config.js ]; then
+    cat >> /config/interface_config.js << 'BRAND'
+interfaceConfig.APP_NAME = 'Sigeres';
+interfaceConfig.NATIVE_APP_NAME = 'Sigeres';
+interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME = 'Participante';
+interfaceConfig.DEFAULT_LOCAL_DISPLAY_NAME = 'yo';
+interfaceConfig.JITSI_WATERMARK_LINK = '';
+interfaceConfig.SHOW_JITSI_WATERMARK = false;
+interfaceConfig.SHOW_BRAND_WATERMARK = false;
+interfaceConfig.SHOW_POWERED_BY = false;
+BRAND
+fi
+
+echo ">>> Branding applied: Sigeres"
